@@ -27,16 +27,20 @@ func NewTrashcanHandler(tu usecase.TrashcanUseCase) TrashcanHandler {
 }
 
 func (th trashcanHandler) HandleTrashcanCreate(c echo.Context) error {
-	var trashcan *domain.Trashcan
-	if err := c.Bind(&trashcan); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"success": false})
+	var trashcanConfig domain.TrashcanConfig
+	if err := c.Bind(&trashcanConfig); err != nil {
+		return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid input"})
 	}
 
 	ctx := c.Request().Context()
 
-	err := th.trashcanUsecase.CreateTrashcan(ctx, trashcan)
+	err := th.trashcanUsecase.CreateTrashcan(ctx, &trashcanConfig)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false})
+		if err == domain.ErrInvalidInput {
+			return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid input"})
+		}
+
+		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false, "message": "Failed to create trashcan"})
 	}
 
 	return c.JSON(http.StatusCreated, echo.Map{"success": true})
@@ -52,12 +56,12 @@ func (th trashcanHandler) HandleTrashcansInRange(c echo.Context) error {
 
 	latitudeFloat, err := strconv.ParseFloat(latitude, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"success": false})
+		return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid latitude"})
 	}
 
 	longitudeFloat, err := strconv.ParseFloat(longitude, 64)
 	if err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"success": false})
+		return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid longitude"})
 	}
 
 	trashcans, err := th.trashcanUsecase.GetTrashcansInRange(ctx, latitudeFloat, longitudeFloat, float64(range_radius))

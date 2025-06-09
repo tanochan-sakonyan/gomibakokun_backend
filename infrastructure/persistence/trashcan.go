@@ -18,7 +18,7 @@ func NewTrashcanPersistence(client *firestore.Client) repository.TrashcanReposit
 }
 
 func (tp trashcanPersistence) CreateTrashcan(ctx context.Context, trashcan *domain.Trashcan) error {
-	_, err := tp.client.Collection("trashcans").Doc(trashcan.ID).Set(ctx, trashcan)
+	_, err := tp.client.Collection("trashcans").Doc(trashcan.GetID()).Set(ctx, trashcan)
 	if err != nil {
 		log.Printf("An error has occurred to create trashcan: %s", err)
 	}
