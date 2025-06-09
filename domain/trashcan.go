@@ -11,6 +11,14 @@ type Trashcan struct {
 	selectedButton  string
 }
 
+func (t Trashcan) GetID() string {
+	return t.id
+}
+
+func (t Trashcan) GetLatitudeAndLongitude() (float64, float64) {
+	return t.latitude, t.longitude
+}
+
 func NewTrashcan(config *TrashcanConfig) (*Trashcan, error) {
 	if err := ValidateTrashcanConfig(config); err != nil {
 		return nil, err

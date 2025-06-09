@@ -11,7 +11,7 @@ import (
 )
 
 type TrashcanUseCase interface {
-	CreateTrashcan(ctx context.Context, trashcan *domain.Trashcan) error
+	CreateTrashcan(ctx context.Context, trashcanConfig *domain.TrashcanConfig) error
 	GetTrashcansInRange(ctx context.Context, latitude float64, longitude float64, radius float64) ([]*domain.Trashcan, error)
 	DeleteTrashcan(ctx context.Context, id string) error
 }
@@ -26,13 +26,18 @@ func NewTrashcanUseCase(tr repository.TrashcanRepository) TrashcanUseCase {
 	}
 }
 
-func (tu *trashcanUseCase) CreateTrashcan(ctx context.Context, trashcan *domain.Trashcan) error {
-	// Generate a new UUID for the trashcan ID
-	ID, err := uuid.NewRandom()
+func (tu *trashcanUseCase) CreateTrashcan(ctx context.Context, trashcanConfig *domain.TrashcanConfig) error {
+	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	trashcan.ID = ID.String()
+	trashcanConfig.ID = id.String()
+
+	//ゴミ箱ドメインの作成
+	trashcan, err := domain.NewTrashcan(trashcanConfig)
+	if err != nil {
+		return domain.ErrInvalidInput
+	}
 
 	err = tu.trashcanRepository.CreateTrashcan(ctx, trashcan)
 
@@ -47,7 +52,8 @@ func (tu *trashcanUseCase) GetTrashcansInRange(ctx context.Context, latitude flo
 
 	var trashcansInRange []*domain.Trashcan
 	for _, trashcan := range trashcans {
-		if isInRange(latitude, longitude, trashcan.Latitude, trashcan.Longitude, radius) {
+		trashcanLatitude, trashcanLongitude := trashcan.GetLatitudeAndLongitude()
+		if isInRange(latitude, longitude, trashcanLatitude, trashcanLongitude, radius) {
 			trashcansInRange = append(trashcansInRange, trashcan)
 		}
 	}

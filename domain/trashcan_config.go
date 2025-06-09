@@ -8,5 +8,5 @@ type TrashcanConfig struct {
 	TrashType       []string `json:"trash_type"`
 	NearestBuilding string   `json:"nearest_building"`
 	Note            string   `json:"note"`
-	SelectedButton  string   `json:"selected_button"`
+	SelectedButton  string   `json:"selectedButton"`
 }

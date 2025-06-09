@@ -1,6 +1,8 @@
 package domain
 
-import "slices"
+import (
+	"slices"
+)
 
 func ValidateTrashcanConfig(config *TrashcanConfig) error {
 	if config.ID == "" {
