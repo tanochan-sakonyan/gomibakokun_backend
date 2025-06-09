@@ -66,7 +66,7 @@ func (th trashcanHandler) HandleTrashcansInRange(c echo.Context) error {
 
 	trashcans, err := th.trashcanUsecase.GetTrashcansInRange(ctx, latitudeFloat, longitudeFloat, float64(range_radius))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false})
+		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false, "message": "Failed to retrieve trashcans"})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"success": true, "trashcans": trashcans})
@@ -79,7 +79,7 @@ func (th trashcanHandler) HandleTrashcanDelete(c echo.Context) error {
 
 	err := th.trashcanUsecase.DeleteTrashcan(ctx, id)
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false})
+		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false, "message": "Failed to delete trashcan"})
 	}
 
 	return c.JSON(http.StatusOK, echo.Map{"success": true})
