@@ -41,7 +41,7 @@ func TestValidateTrashcanConfig(t *testing.T) {
 		},
 		{
 			name: " Invalid TrashcanConfig - Invalid Latitude",
-			config: &TrashcanConfig{
+			config: &domain.TrashcanConfig{
 				ID:              "123",
 				Latitude:        100.0,
 				Longitude:       139.6917,
@@ -51,11 +51,11 @@ func TestValidateTrashcanConfig(t *testing.T) {
 				Note:            "Near the park",
 				SelectedButton:  "insideGate",
 			},
-			wantErr: ErrInvalidInput,
+			wantErr: domain.ErrInvalidInput,
 		},
 		{
 			name: " Invalid TrashcanConfig - Invalid Longitude",
-			config: &TrashcanConfig{
+			config: &domain.TrashcanConfig{
 				ID:              "123",
 				Latitude:        35.6895,
 				Longitude:       190.0,
@@ -65,11 +65,11 @@ func TestValidateTrashcanConfig(t *testing.T) {
 				Note:            "Near the park",
 				SelectedButton:  "insideGate",
 			},
-			wantErr: ErrInvalidInput,
+			wantErr: domain.ErrInvalidInput,
 		},
 		{
 			name: " Invalid TrashcanConfig - Invalid TrashType",
-			config: &TrashcanConfig{
+			config: &domain.TrashcanConfig{
 				ID:              "123",
 				Latitude:        35.6895,
 				Longitude:       160.0,
@@ -79,11 +79,11 @@ func TestValidateTrashcanConfig(t *testing.T) {
 				Note:            "Near the park",
 				SelectedButton:  "insideGate",
 			},
-			wantErr: ErrInvalidInput,
+			wantErr: domain.ErrInvalidInput,
 		},
 		{
 			name: " Invalid TrashcanConfig - Invalid TrashType",
-			config: &TrashcanConfig{
+			config: &domain.TrashcanConfig{
 				ID:              "123",
 				Latitude:        35.6895,
 				Longitude:       -150.0,
@@ -93,11 +93,11 @@ func TestValidateTrashcanConfig(t *testing.T) {
 				Note:            "Near the park",
 				SelectedButton:  "insideGate",
 			},
-			wantErr: ErrInvalidInput,
+			wantErr: domain.ErrInvalidInput,
 		},
 		{
 			name: " Invalid TrashcanConfig - Invalid SelectedButton",
-			config: &TrashcanConfig{
+			config: &domain.TrashcanConfig{
 				ID:              "123",
 				Latitude:        35.6895,
 				Longitude:       -150.0,
@@ -107,12 +107,12 @@ func TestValidateTrashcanConfig(t *testing.T) {
 				Note:            "Near the park",
 				SelectedButton:  "recycle",
 			},
-			wantErr: ErrInvalidInput,
+			wantErr: domain.ErrInvalidInput,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateTrashcanConfig(tt.config)
+			err := domain.ValidateTrashcanConfig(tt.config)
 			if err != tt.wantErr {
 				t.Errorf("ValidateTrashcanConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
