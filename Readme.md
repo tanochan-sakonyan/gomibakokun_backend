@@ -41,7 +41,7 @@
 ```
 $ go run main.go
 ```
-BaseURL :[ `http://localhost:8080`](http://localhost:8080)
+BaseURL :[`http://localhost:8080`](http://localhost:8080)
 
 ### エンドポイント
 
