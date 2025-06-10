@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	"gomibakokun_backend/domain"
+	domain "gomibakokun_backend/domain/trashcan"
 )
 
 type TrashcanRepository interface {

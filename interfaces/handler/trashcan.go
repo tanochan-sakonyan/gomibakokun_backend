@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"gomibakokun_backend/domain"
+	domain "gomibakokun_backend/domain/trashcan"
 	"gomibakokun_backend/usecase"
 	"net/http"
 
