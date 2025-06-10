@@ -5,8 +5,6 @@ import (
 	"gomibakokun_backend/domain/repository"
 	domain "gomibakokun_backend/domain/trashcan"
 
-	"math"
-
 	"github.com/google/uuid"
 )
 
@@ -53,7 +51,7 @@ func (tu *trashcanUseCase) GetTrashcansInRange(ctx context.Context, latitude flo
 	var trashcansInRange []*domain.Trashcan
 	for _, trashcan := range trashcans {
 		trashcanLatitude, trashcanLongitude := trashcan.GetLatitudeAndLongitude()
-		if isInRange(latitude, longitude, trashcanLatitude, trashcanLongitude, radius) {
+		if IsInRange(latitude, longitude, trashcanLatitude, trashcanLongitude, radius) {
 			trashcansInRange = append(trashcansInRange, trashcan)
 		}
 	}
@@ -67,16 +65,4 @@ func (tu *trashcanUseCase) DeleteTrashcan(ctx context.Context, id string) error 
 		return err
 	}
 	return nil
-}
-
-func isInRange(lat1, lon1, lat2, lon2, radiusKm float64) bool {
-	// Haversine formula to calculate the distance between two points on the Earth
-	const R = 6371 // Radius of the Earth in kilometers
-	dLat := (lat2 - lat1) * (3.141592653589793 / 180)
-	dLon := (lon2 - lon1) * (3.141592653589793 / 180)
-	a := (math.Sin(dLat/2) * math.Sin(dLat/2)) + (math.Sin(lat1*(3.141592653589793/180)) * math.Sin(lat2*(3.141592653589793/180)) * math.Sin(dLon/2) * math.Sin(dLon/2))
-	c := 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
-	distance := R * c // Distance in kilometers
-
-	return distance <= radiusKm
 }

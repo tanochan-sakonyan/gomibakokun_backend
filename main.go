@@ -4,7 +4,7 @@ import (
 	firestore "gomibakokun_backend/infrastructure"
 	"gomibakokun_backend/infrastructure/persistence"
 	"gomibakokun_backend/interfaces/handler"
-	"gomibakokun_backend/usecase"
+	usecase "gomibakokun_backend/usecase/trashcan"
 
 	"context"
 	"log"

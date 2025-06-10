@@ -2,7 +2,7 @@ package handler
 
 import (
 	domain "gomibakokun_backend/domain/trashcan"
-	"gomibakokun_backend/usecase"
+	usecase "gomibakokun_backend/usecase/trashcan"
 	"net/http"
 
 	"strconv"
