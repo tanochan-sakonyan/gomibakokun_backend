@@ -2,8 +2,8 @@ package persistence
 
 import (
 	"context"
-	"gomibakokun_backend/domain"
 	"gomibakokun_backend/domain/repository"
+	domain "gomibakokun_backend/domain/trashcan"
 	"log"
 
 	"cloud.google.com/go/firestore"

@@ -2,8 +2,8 @@ package usecase
 
 import (
 	"context"
-	"gomibakokun_backend/domain"
 	"gomibakokun_backend/domain/repository"
+	domain "gomibakokun_backend/domain/trashcan"
 
 	"math"
 
