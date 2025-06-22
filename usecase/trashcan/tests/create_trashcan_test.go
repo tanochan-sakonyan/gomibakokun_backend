@@ -37,22 +37,21 @@ func TestCreateTrashcan_Success(t *testing.T) {
 
 func TestCreateTrashcan_Fail(t *testing.T) {
 	ctx := context.Background()
-
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	trashcanConfig := &domain.TrashcanConfig{
-		Latitude:        350.6895,
-		Longitude:       139.6917,
-		TrashType:       []string{"burnable"},
-		NearestBuilding: "Tokyo Tower",
-		Note:            "Near the park",
-		SelectedButton:  "insideGate",
+		Latitude:  350.6895, // 不正な値
+		Longitude: 139.6917,
+		// ...
 	}
 
 	mockRepo := mock.NewMockTrashcanRepository(ctrl)
-	mockRepo.EXPECT().CreateTrashcan(ctx, gomock.Any()).Return(nil)
+	// mockRepo.EXPECT() の記述は不要
+
 	trashcanUseCase := usecase.NewTrashcanUseCase(mockRepo)
 	err := trashcanUseCase.CreateTrashcan(ctx, trashcanConfig)
-	require.NoError(t, err)
+
+	// バリデーションエラーが発生することを検証
+	require.ErrorIs(t, err, domain.ErrInvalidInput)
 }
