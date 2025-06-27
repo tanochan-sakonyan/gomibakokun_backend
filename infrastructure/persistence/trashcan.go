@@ -18,7 +18,13 @@ func NewTrashcanPersistence(client *firestore.Client) repository.TrashcanReposit
 }
 
 func (tp trashcanPersistence) CreateTrashcan(ctx context.Context, trashcan *domain.Trashcan) error {
-	_, err := tp.client.Collection("trashcans").Doc(trashcan.GetID()).Set(ctx, trashcan)
+	trashcanModel := fromDomain(trashcan)
+	if trashcanModel == nil {
+		log.Printf("An error has occurred to convert trashcan to model: %s", trashcan.GetID())
+		return domain.ErrInvalidInput
+	}
+
+	_, err := tp.client.Collection("trashcans").Doc(trashcan.GetID()).Set(ctx, trashcanModel)
 	if err != nil {
 		log.Printf("An error has occurred to create trashcan: %s", err)
 	}
@@ -35,12 +41,19 @@ func (tp trashcanPersistence) GetAllTrashcan(ctx context.Context) ([]*domain.Tra
 		if err != nil {
 			break
 		}
-		var trashcan domain.Trashcan
-		if err := doc.DataTo(&trashcan); err != nil {
-			log.Printf("An error has occurred to get all trashcans: %s", err)
-			return nil, err
+		var trashcanModel TrashcanModel
+		if err := doc.DataTo(&trashcanModel); err != nil {
+			log.Printf("An error has occurred to convert document to trashcan model: %s", err)
+			continue
 		}
-		trashcans = append(trashcans, &trashcan)
+		log.Printf(trashcanModel.ID)
+		trashcan, err := trashcanModel.toDomain()
+		if err != nil {
+			log.Printf("An error has occurred to convert trashcan model to domain: %s", err)
+			continue
+		}
+
+		trashcans = append(trashcans, trashcan)
 	}
 
 	return trashcans, nil

@@ -4,30 +4,6 @@ import (
 	"slices"
 )
 
-func ValidateTrashcanConfig(config *TrashcanConfig) error {
-	if config.ID == "" {
-		return ErrInvalidInput
-	}
-
-	if err := ValidateLatitude(config.Latitude); err != nil {
-		return err
-	}
-
-	if err := ValidateLongitude(config.Longitude); err != nil {
-		return err
-	}
-
-	if err := ValidateTrashType(config.TrashType); err != nil {
-		return err
-	}
-
-	if err := ValidateSelectedButton(config.SelectedButton); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func ValidateLatitude(latitude float64) error {
 	if latitude < -90 || latitude > 90 {
 		return ErrInvalidInput

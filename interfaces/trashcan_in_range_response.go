@@ -1,6 +1,6 @@
-package domain
+package interfaces
 
-type TrashcanConfig struct {
+type TrashcanResponse struct {
 	ID              string   `json:"id"`
 	Latitude        float64  `json:"latitude"`
 	Longitude       float64  `json:"longitude"`
@@ -8,5 +8,5 @@ type TrashcanConfig struct {
 	TrashType       []string `json:"trash_type"`
 	NearestBuilding string   `json:"nearest_building"`
 	Note            string   `json:"note"`
-	SelectedButton  string   `json:"selectedButton"`
+	SelectedButton  string   `json:"selected_button"`
 }
