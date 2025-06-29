@@ -44,13 +44,11 @@ func (tp trashcanPersistence) GetAllTrashcan(ctx context.Context) ([]*domain.Tra
 		var trashcanModel TrashcanModel
 		if err := doc.DataTo(&trashcanModel); err != nil {
 			log.Printf("An error has occurred to convert document to trashcan model: %s", err)
-			continue
 		}
-		log.Printf(trashcanModel.ID)
+		log.Printf("Document ID: %s", doc.Ref.ID)
 		trashcan, err := trashcanModel.toDomain()
 		if err != nil {
 			log.Printf("An error has occurred to convert trashcan model to domain: %s", err)
-			continue
 		}
 
 		trashcans = append(trashcans, trashcan)

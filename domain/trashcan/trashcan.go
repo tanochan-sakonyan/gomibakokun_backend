@@ -1,5 +1,9 @@
 package domain
 
+import (
+	"log"
+)
+
 type Trashcan struct {
 	id              string
 	latitude        float64
@@ -45,17 +49,21 @@ func (t Trashcan) GetSelectedButton() string {
 
 func NewTrashcan(id string, latitude float64, longitude float64, image string, trashType []string, nearestBuilding string, note string, selectedButton string) (*Trashcan, error) {
 	if err := ValidateLatitude(latitude); err != nil {
+		log.Printf("Invalid latitude: %v", latitude)
 		return nil, err
 	}
 	if err := ValidateLongitude(longitude); err != nil {
+		log.Printf("Invalid longitude: %v", longitude)
 		return nil, err
 	}
-	if err := ValidateTrashType(trashType); err != nil {
-		return nil, err
-	}
-	if err := ValidateSelectedButton(selectedButton); err != nil {
-		return nil, err
-	}
+	// if err := ValidateTrashType(trashType); err != nil {
+	// 	log.Printf("Invalid trash type: %v", trashType)
+	// 	return nil, err
+	// }
+	// TODO:一時的にコメントアウト既存のデータにも追加する
+	// if err := ValidateSelectedButton(selectedButton); err != nil {
+	// 	return nil, err
+	// }
 
 	return &Trashcan{
 		id:              id,
