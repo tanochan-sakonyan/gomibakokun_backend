@@ -4,6 +4,7 @@ import (
 	"context"
 	"gomibakokun_backend/domain/repository"
 	domain "gomibakokun_backend/domain/trashcan"
+	"log"
 
 	"math"
 
@@ -11,8 +12,8 @@ import (
 )
 
 type TrashcanUseCase interface {
-	CreateTrashcan(ctx context.Context, trashcanConfig *domain.TrashcanConfig) error
-	GetTrashcansInRange(ctx context.Context, latitude float64, longitude float64, radius float64) ([]*domain.Trashcan, error)
+	CreateTrashcan(ctx context.Context, trashcanInput *TrashcanInput) error
+	GetTrashcansInRange(ctx context.Context, latitude float64, longitude float64, radius float64) ([]*TrashcanOutput, error)
 	DeleteTrashcan(ctx context.Context, id string) error
 }
 
@@ -26,15 +27,23 @@ func NewTrashcanUseCase(tr repository.TrashcanRepository) TrashcanUseCase {
 	}
 }
 
-func (tu *trashcanUseCase) CreateTrashcan(ctx context.Context, trashcanConfig *domain.TrashcanConfig) error {
+func (tu *trashcanUseCase) CreateTrashcan(ctx context.Context, trashcanInput *TrashcanInput) error {
 	id, err := uuid.NewRandom()
 	if err != nil {
 		return err
 	}
-	trashcanConfig.ID = id.String()
 
 	//ゴミ箱ドメインの作成
-	trashcan, err := domain.NewTrashcan(trashcanConfig)
+	trashcan, err := domain.NewTrashcan(
+		id.String(),
+		trashcanInput.Latitude,
+		trashcanInput.Longitude,
+		trashcanInput.Image,
+		trashcanInput.TrashType,
+		trashcanInput.NearestBuilding,
+		trashcanInput.Note,
+		trashcanInput.SelectedButton,
+	)
 	if err != nil {
 		return domain.ErrInvalidInput
 	}
@@ -44,21 +53,31 @@ func (tu *trashcanUseCase) CreateTrashcan(ctx context.Context, trashcanConfig *d
 	return err
 }
 
-func (tu *trashcanUseCase) GetTrashcansInRange(ctx context.Context, latitude float64, longitude float64, radius float64) ([]*domain.Trashcan, error) {
+func (tu *trashcanUseCase) GetTrashcansInRange(ctx context.Context, latitude float64, longitude float64, radius float64) ([]*TrashcanOutput, error) {
 	trashcans, err := tu.trashcanRepository.GetAllTrashcan(ctx)
 	if err != nil {
 		return nil, err
 	}
+	log.Printf("Found %d trashcans in the repository", len(trashcans))
 
-	var trashcansInRange []*domain.Trashcan
+	//半径内のゴミ箱を取得
+	var trashcanOutpusInRange []*TrashcanOutput
 	for _, trashcan := range trashcans {
-		trashcanLatitude, trashcanLongitude := trashcan.GetLatitudeAndLongitude()
-		if isInRange(latitude, longitude, trashcanLatitude, trashcanLongitude, radius) {
-			trashcansInRange = append(trashcansInRange, trashcan)
+		if isInRange(latitude, longitude, trashcan.GetLatitude(), trashcan.GetLongitude(), radius) {
+			trashcanOutput := &TrashcanOutput{
+				ID:              trashcan.GetID(),
+				Latitude:        trashcan.GetLatitude(),
+				Longitude:       trashcan.GetLongitude(),
+				Image:           trashcan.GetImage(),
+				TrashType:       trashcan.GetTrashType(),
+				NearestBuilding: trashcan.GetNearestBuilding(),
+				Note:            trashcan.GetNote(),
+				SelectedButton:  trashcan.GetSelectedButton(),
+			}
+			trashcanOutpusInRange = append(trashcanOutpusInRange, trashcanOutput)
 		}
 	}
-
-	return trashcansInRange, nil
+	return trashcanOutpusInRange, nil
 }
 
 func (tu *trashcanUseCase) DeleteTrashcan(ctx context.Context, id string) error {

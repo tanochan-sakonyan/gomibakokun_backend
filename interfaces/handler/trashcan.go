@@ -2,6 +2,7 @@ package handler
 
 import (
 	domain "gomibakokun_backend/domain/trashcan"
+	interfaces "gomibakokun_backend/interfaces"
 	"gomibakokun_backend/usecase"
 	"net/http"
 
@@ -27,14 +28,23 @@ func NewTrashcanHandler(tu usecase.TrashcanUseCase) TrashcanHandler {
 }
 
 func (th trashcanHandler) HandleTrashcanCreate(c echo.Context) error {
-	var trashcanConfig domain.TrashcanConfig
-	if err := c.Bind(&trashcanConfig); err != nil {
+	var createTrashcanRequest interfaces.CreateTrashcanRequest
+	if err := c.Bind(&createTrashcanRequest); err != nil {
 		return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid input"})
 	}
 
 	ctx := c.Request().Context()
+	trashcanInput := &usecase.TrashcanInput{
+		Latitude:        createTrashcanRequest.Latitude,
+		Longitude:       createTrashcanRequest.Longitude,
+		Image:           createTrashcanRequest.Image,
+		TrashType:       createTrashcanRequest.TrashType,
+		NearestBuilding: createTrashcanRequest.NearestBuilding,
+		Note:            createTrashcanRequest.Note,
+		SelectedButton:  createTrashcanRequest.SelectedButton,
+	}
 
-	err := th.trashcanUsecase.CreateTrashcan(ctx, &trashcanConfig)
+	err := th.trashcanUsecase.CreateTrashcan(ctx, trashcanInput)
 	if err != nil {
 		if err == domain.ErrInvalidInput {
 			return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid input"})
@@ -64,12 +74,26 @@ func (th trashcanHandler) HandleTrashcansInRange(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, echo.Map{"success": false, "message": "Invalid longitude"})
 	}
 
-	trashcans, err := th.trashcanUsecase.GetTrashcansInRange(ctx, latitudeFloat, longitudeFloat, float64(range_radius))
+	trashcanOutputs, err := th.trashcanUsecase.GetTrashcansInRange(ctx, latitudeFloat, longitudeFloat, float64(range_radius))
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, echo.Map{"success": false})
 	}
 
-	return c.JSON(http.StatusOK, echo.Map{"success": true, "trashcans": trashcans})
+	trashcanResponses := make([]interfaces.TrashcanResponse, len(trashcanOutputs))
+	for i, trashcanOutput := range trashcanOutputs {
+		trashcanResponses[i] = interfaces.TrashcanResponse{
+			ID:              trashcanOutput.ID,
+			Latitude:        trashcanOutput.Latitude,
+			Longitude:       trashcanOutput.Longitude,
+			Image:           trashcanOutput.Image,
+			TrashType:       trashcanOutput.TrashType,
+			NearestBuilding: trashcanOutput.NearestBuilding,
+			Note:            trashcanOutput.Note,
+			SelectedButton:  trashcanOutput.SelectedButton,
+		}
+	}
+
+	return c.JSON(http.StatusOK, echo.Map{"success": true, "trashcans": trashcanResponses})
 }
 
 func (th trashcanHandler) HandleTrashcanDelete(c echo.Context) error {
